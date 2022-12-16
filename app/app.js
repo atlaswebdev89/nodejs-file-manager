@@ -1,32 +1,18 @@
-// Parser args argumentov cli. Get username
-const getUsernameFromArgs = async () => {
-    const arg = process.argv.slice(2);
-    const username = arg.reduce((acc, value, index, array) => {
-        if (value.startsWith("--username=")) {
-            acc = value.replace("--username=", "");
-            return acc;
-        }
-        return acc;
-    }, "");
-    return username;
-};
+import { getUsernameFromArgs } from "../lib/parserArgvCli.js";
+import messageOutput from "../lib/colorTextConsole.js";
+import { router } from "./router.js";
 
 const username = await getUsernameFromArgs();
+
 const WelcomeMessage = `Welcome to the File Manager, ${username}!\n`;
 const ExitMessage = `\nThank you for using File Manager, ${username}, goodbye!\n`;
-process.stdout.write(WelcomeMessage);
 
-// cheker command .exit
-const checkerEndProgramCommand = (data) => {
-    if(data.toString().trim() == ".exit") {
-        process.stdout.write(ExitMessage);
-        process.exit();
-    }
-}
+messageOutput(WelcomeMessage, "green");
+messageOutput(`You are currently in ${process.cwd()}`, "green");
 
-process.stdin.on("data", (data) => {
-    checkerEndProgramCommand (data);
-    process.stdout.write(data);
+process.stdin.on("data", async (data) => {
+    await router(data);
+    messageOutput(`You are currently in ${process.cwd()}`, "green");
 });
 
 // handler ctrl+c
@@ -35,7 +21,5 @@ process.on("SIGINT", (data) => {
 });
 // handler ctrl+c
 process.on("exit", (data) => {
-    process.stdout.write(ExitMessage);
+    messageOutput(ExitMessage, "green");
 });
-
-
