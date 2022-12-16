@@ -35,6 +35,9 @@ export const readStream = async (file) => {
         stream.on("error", (err) => {
             messageOutput(err.message, 'red');
         });
+        stream.on("end", () => {
+            process.stdout.write('\n');
+        })
         stream.pipe(process.stdout);
     } catch (err) {
         messageOutput(err.message, "red");

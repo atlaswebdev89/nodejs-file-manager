@@ -18,24 +18,32 @@ export default async function () {
         return 0;
     };
 
-    const arrDirs = [];
-    const arrFiles = [];
+    const dirs = [];
+    for (let i = 0; i < list.length; i++) {
+        if ((await fs.stat(path.resolve(list[i]))).isDirectory()) {
+            dirs.push(list[i]);
+        }
+    }
 
-    const promises = list.map ( async (elem) => {
-       if ((await fs.stat(path.resolve(elem))).isFile()){
-        arrFiles.push({
-            Name: `${elem}`,
-            Type: "file",
-        })
-       }else {
-        arrDirs.push({
+    const arrDirs = dirs.map((elem) => {
+        return {
             Name: `${elem}`,
             Type: "directory",
-        })
-       }
+        };
+    }).sort(sortName);
+
+    const files = [];
+    for (let i = 0; i < list.length; i++) {
+        if ((await fs.stat(path.resolve(list[i]))).isFile()) {
+            files.push(list[i]);
+        }
     }
-    );
-    
-    await Promise.all(promises);
+    const arrFiles = files.map((elem) => {
+        return {
+            Name: `${elem}`,
+            Type: "file",
+        };
+    }).sort(sortName);
+
     console.table([...arrDirs.sort(sortName), ...arrFiles.sort(sortName)]);
 }
